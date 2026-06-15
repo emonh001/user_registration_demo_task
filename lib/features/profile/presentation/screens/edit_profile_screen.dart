@@ -29,6 +29,7 @@ class EditProfileScreen extends StatelessWidget {
             name: user.fullName,
             email: user.email,
             phone: user.phone ?? "+8801",
+            password: user.password
           );
         }
 
@@ -95,6 +96,12 @@ class _EditProfileView extends StatelessWidget {
                   label: "Phone Number",
                   controller: provider.phoneController,
                   validator: provider.validatePhone,
+                ),
+                const SizedBox(height: 14),
+                ProfileTextField(
+                  label: "Password",
+                  controller: provider.passwordController,
+                  hintText: "****",
                 ),
 
                 const SizedBox(height: 30),

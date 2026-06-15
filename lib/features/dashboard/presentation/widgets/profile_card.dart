@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:user_signup/features/auth/presentation/screens/sign_in_screen.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../auth/presentation/providers/auth_provider.dart';
@@ -41,22 +42,51 @@ class ProfileCard extends StatelessWidget {
 
           Text(
             user?.email ?? "",
-            style: TextStyle(
-              fontSize: 13,
-              color: AppColors.mutedText,
-            ),
+            style: TextStyle(fontSize: 13, color: AppColors.mutedText),
           ),
 
           const SizedBox(height: 14),
 
-          SizedBox(
-            width: 120,
-            height: 36,
-            child: Consumer<BottomNavProvider>(
-              builder: (context, nav, child) {
-                return ElevatedButton(
-                  onPressed: () {
-                    nav.changeIndex(1);
+          Row(
+            children: [
+              SizedBox(
+                width: 120,
+                height: 36,
+                child: Consumer<BottomNavProvider>(
+                  builder: (context, nav, child) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        nav.changeIndex(1);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        "Edit Profile",
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const Spacer(),
+              SizedBox(
+                width: 120,
+                height: 36,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    final logout = context.read<AuthProvider>();
+                    logout.logout();
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignInScreen()),
+                      (predicate) => true,
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
@@ -66,13 +96,10 @@ class ProfileCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    "Edit Profile",
-                    style: TextStyle(fontSize: 12),
-                  ),
-                );
-              }
-            ),
+                  child: const Text("Logout", style: TextStyle(fontSize: 12)),
+                ),
+              ),
+            ],
           ),
         ],
       ),

@@ -9,6 +9,7 @@ class EditProfileProvider extends ChangeNotifier {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
 
   final AuthRepository _repository;
   EditProfileProvider({required AuthRepository repository})
@@ -22,10 +23,13 @@ class EditProfileProvider extends ChangeNotifier {
     required String name,
     required String email,
     required String phone,
+    required String password
   }) {
     nameController.text = name;
     emailController.text = email;
     phoneController.text = phone;
+    passwordController.text = password;
+    passwordController.clear();
   }
 
   void setLoading(bool value) {
@@ -40,15 +44,32 @@ class EditProfileProvider extends ChangeNotifier {
     setLoading(true);
 
     try {
+      // 1. GET EXISTING USER
+      final existingUser = await _repository.getUserById(userId);
+
+      if (existingUser == null) return false;
+
+      // 2. CHECK PASSWORD INPUT
+      final newPassword = passwordController.text.trim();
+
+      final finalPassword = newPassword.isNotEmpty
+          ? newPassword
+          : existingUser.password;
+
+      // 3. BUILD UPDATED USER
       final updatedUser = UserModel(
         id: userId,
         fullName: nameController.text.trim(),
         email: emailController.text.trim(),
-        password: "", // keep unchanged or fetch from DB later
         phone: phoneController.text.trim(),
-        createdAt: DateTime.now().toIso8601String(),
+
+        // 🔥 SMART PASSWORD HANDLING
+        password: finalPassword,
+
+        createdAt: existingUser.createdAt,
       );
 
+      // 4. UPDATE DB
       final result = await _repository.updateProfile(updatedUser);
 
       return result;
@@ -67,6 +88,13 @@ class EditProfileProvider extends ChangeNotifier {
   String? validatePhone(String? value) {
     if (value == null || value.trim().isEmpty) {
       return "Phone is required";
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return "Password is required";
     }
     return null;
   }

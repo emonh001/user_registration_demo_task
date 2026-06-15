@@ -9,9 +9,11 @@ class ProfileTextField extends StatelessWidget {
     this.validator,
     this.enabled = true,
     this.suffix,
+    this.hintText
   });
 
   final String label;
+  final String? hintText;
   final TextEditingController controller;
   final String? Function(String?)? validator;
   final bool enabled;
@@ -38,6 +40,7 @@ class ProfileTextField extends StatelessWidget {
           enabled: enabled,
           decoration: InputDecoration(
             filled: true,
+            hintText: hintText,
             fillColor: Colors.white,
             suffixIcon: suffix,
             border: OutlineInputBorder(

@@ -33,7 +33,7 @@ class EditProfileScreen extends StatelessWidget {
             email: user.email ?? "",
             phone: user.phone ?? "",
             password: user.password ?? "",
-            imagePath: user.imagePath, // 🔥 FIXED (MISSING BEFORE)
+            imagePath: user.imagePath,
           );
         }
 
@@ -100,6 +100,7 @@ class _EditProfileView extends StatelessWidget {
                   label: "Phone Number",
                   controller: provider.phoneController,
                   validator: provider.validatePhone,
+                  hintText: "+8801****",
                 ),
                 const SizedBox(height: 14),
                 ProfileTextField(

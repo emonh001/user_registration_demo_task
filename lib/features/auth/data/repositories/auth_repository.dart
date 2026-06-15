@@ -39,6 +39,11 @@ class AuthRepository {
     return UserModel.fromMap(data);
   }
 
+  Future<bool> updateProfile(UserModel user) async {
+    final result = await _local.updateUser(user);
+    return result > 0;
+  }
+
   // LOGOUT
   Future<void> logout() {
     return _session.logout();

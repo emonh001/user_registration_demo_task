@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:user_signup/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:user_signup/features/bottom_nav_holder/presentation/screens/dashboard_shell.dart';
 import 'package:user_signup/shared/widgets/show_snack_bar_message.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -22,12 +23,11 @@ class SignInScreen extends StatelessWidget {
     if (isSuccess) {
 
       showSnackBarMessage(context, 'Sign in successful');
-      // TODO: Navigate to dashboard screen.
-      // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(
-      //     builder: (_) => const DashboardScreen(),
-      //   ),
-      // );
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (_) => const DashboardShell(),
+        ),
+      );
     } else {
       showSnackBarMessage(context, 'Invalid email or password');
     }

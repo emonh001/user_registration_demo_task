@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:user_signup/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:user_signup/shared/widgets/show_snack_bar_message.dart';
 
 import '../../../../core/theme/app_colors.dart';
@@ -33,11 +34,11 @@ class SignInScreen extends StatelessWidget {
   }
 
   void _goToSignUp(BuildContext context) {
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (_) => const SignUpScreen(),
-    //   ),
-    // );
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const SignUpScreen(),
+      ),
+    );
   }
 
   @override
@@ -108,11 +109,12 @@ class SignInScreen extends StatelessWidget {
                         obscureText: authProvider.isPasswordHidden,
                         textInputAction: TextInputAction.done,
                         validator: authProvider.validatePassword,
-                        prefixIcon: Icon(Icons.password_outlined),
+                        prefixIcon: Icon(Icons.lock_outline_rounded),
                         suffixIcon: Icon(
                           authProvider.isPasswordHidden
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
+                          size: 18,
                         ),
                         suffixIconOnTap: authProvider.togglePasswordVisibility,
                       ),

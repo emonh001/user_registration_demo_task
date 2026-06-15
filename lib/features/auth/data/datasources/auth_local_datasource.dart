@@ -49,4 +49,15 @@ class AuthLocalDataSource {
     }
     return null;
   }
+
+  Future<int> updateUser(UserModel user) async {
+    final db = await _dbProvider.database;
+
+    return await db.update(
+      DBConstants.userTable,
+      user.toMap(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
+  }
 }

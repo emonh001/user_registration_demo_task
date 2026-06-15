@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:user_signup/features/bottom_nav_holder/presentation/providers/bottom_nav_provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/data/repositories/auth_repository.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/edit_profile_provider.dart';
 import '../widgets/profile_image_picker.dart';
 import '../widgets/profile_text_field.dart';
@@ -14,12 +16,24 @@ class EditProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => EditProfileProvider()
-        ..initData(
-          name: "Alex Smith",
-          email: "alex.smith@example.com",
-          phone: "+1 (555) 012-3456",
-        ),
+      create: (context) {
+        final provider = EditProfileProvider(
+          repository: context.read<AuthRepository>(),
+        );
+
+        final auth = context.read<AuthProvider>();
+        final user = auth.currentUser;
+
+        if (user != null) {
+          provider.initData(
+            name: user.fullName,
+            email: user.email,
+            phone: user.phone ?? "+8801",
+          );
+        }
+
+        return provider;
+      },
       child: const _EditProfileView(),
     );
   }
@@ -87,7 +101,15 @@ class _EditProfileView extends StatelessWidget {
 
                 SaveButton(
                   isLoading: provider.isLoading,
-                  onPressed: () => provider.saveProfile(),
+                  onPressed: () {
+                    final auth = context.read<AuthProvider>();
+
+                    final userId = auth.currentUser?.id;
+
+                    if (userId == null) return;
+
+                    provider.saveProfile(userId);
+                  },
                 ),
               ],
             ),

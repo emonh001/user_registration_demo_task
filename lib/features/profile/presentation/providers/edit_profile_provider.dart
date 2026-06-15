@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:user_signup/features/auth/data/repositories/auth_repository.dart';
+
+import '../../../auth/data/models/user_model.dart';
 
 class EditProfileProvider extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
@@ -6,6 +9,10 @@ class EditProfileProvider extends ChangeNotifier {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
+
+  final AuthRepository _repository;
+  EditProfileProvider({required AuthRepository repository})
+      : _repository = repository;
 
   bool _isLoading = false;
 
@@ -26,15 +33,28 @@ class EditProfileProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> saveProfile() async {
-    if (!(formKey.currentState?.validate() ?? false)) return;
+  Future<bool> saveProfile(int userId) async {
+    final isValid = formKey.currentState?.validate() ?? false;
+    if (!isValid) return false;
 
     setLoading(true);
 
-    // TODO: API / DB update here
-    await Future.delayed(const Duration(milliseconds: 800));
+    try {
+      final updatedUser = UserModel(
+        id: userId,
+        fullName: nameController.text.trim(),
+        email: emailController.text.trim(),
+        password: "", // keep unchanged or fetch from DB later
+        phone: phoneController.text.trim(),
+        createdAt: DateTime.now().toIso8601String(),
+      );
 
-    setLoading(false);
+      final result = await _repository.updateProfile(updatedUser);
+
+      return result;
+    } finally {
+      setLoading(false);
+    }
   }
 
   String? validateName(String? value) {

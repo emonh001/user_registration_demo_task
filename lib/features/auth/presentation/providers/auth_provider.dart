@@ -28,6 +28,10 @@ class AuthProvider extends ChangeNotifier {
   bool _initialized = false;
   bool get initialized => _initialized;
 
+  AuthStatus _status = AuthStatus.unknown;
+
+  AuthStatus get status => _status;
+
   // -------------------------
   // VALIDATION (FIXED)
   // -------------------------
@@ -94,21 +98,24 @@ class AuthProvider extends ChangeNotifier {
   // AUTO LOGIN SUPPORT
   // -------------------------
   Future<void> loadSessionUser() async {
-    if (_initialized) return; // 🔥 prevent infinite loop
-
-    _initialized = true;
-
     final userId = await _repository.getCurrentUserId();
 
     if (userId == null) {
-      _currentUser = null;
+      _status = AuthStatus.unauthenticated;
       notifyListeners();
       return;
     }
 
     final user = await _repository.getUserById(userId);
 
+    if (user == null) {
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return;
+    }
+
     _currentUser = user;
+    _status = AuthStatus.authenticated;
 
     notifyListeners();
   }
@@ -130,4 +137,9 @@ class AuthProvider extends ChangeNotifier {
     passwordController.dispose();
     super.dispose();
   }
+}
+enum AuthStatus {
+  unknown,
+  authenticated,
+  unauthenticated,
 }

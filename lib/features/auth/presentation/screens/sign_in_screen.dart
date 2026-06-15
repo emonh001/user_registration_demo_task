@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:user_signup/shared/widgets/show_snack_bar_message.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../shared/widgets/primary_button.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_page_scaffold.dart';
 import '../widgets/auth_text_field.dart';
-import 'sign_up_screen.dart';
 
 class SignInScreen extends StatelessWidget {
   const SignInScreen({super.key});
@@ -19,12 +19,8 @@ class SignInScreen extends StatelessWidget {
     if (!context.mounted) return;
 
     if (isSuccess) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sign in successful'),
-        ),
-      );
 
+      showSnackBarMessage(context, 'Sign in successful');
       // TODO: Navigate to dashboard screen.
       // Navigator.of(context).pushReplacement(
       //   MaterialPageRoute(
@@ -32,26 +28,21 @@ class SignInScreen extends StatelessWidget {
       //   ),
       // );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Invalid email or password'),
-        ),
-      );
+      showSnackBarMessage(context, 'Invalid email or password');
     }
   }
 
   void _goToSignUp(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => const SignUpScreen(),
-      ),
-    );
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (_) => const SignUpScreen(),
+    //   ),
+    // );
   }
 
   @override
   Widget build(BuildContext context) {
     return AuthPageScaffold(
-      title: 'Sign In',
       child: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           return Column(
@@ -105,6 +96,7 @@ class SignInScreen extends StatelessWidget {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         validator: authProvider.validateEmail,
+                        prefixIcon: Icon(Icons.email_outlined),
                       ),
 
                       const SizedBox(height: 18),
@@ -116,54 +108,18 @@ class SignInScreen extends StatelessWidget {
                         obscureText: authProvider.isPasswordHidden,
                         textInputAction: TextInputAction.done,
                         validator: authProvider.validatePassword,
-                        trailing: TextButton(
-                          onPressed: () {
-                            // TODO: Add forgot password logic.
-                          },
-                          style: TextButton.styleFrom(
-                            minimumSize: Size.zero,
-                            padding: EdgeInsets.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                            foregroundColor: AppColors.primary,
-                          ),
-                          child: const Text(
-                            'Forgot Password?',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                        prefixIcon: Icon(Icons.password_outlined),
+                        suffixIcon: Icon(
+                          authProvider.isPasswordHidden
+                              ? Icons.visibility_outlined
+                              : Icons.visibility_off_outlined,
                         ),
+                        suffixIconOnTap: authProvider.togglePasswordVisibility,
                       ),
 
-                      const SizedBox(height: 12),
 
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: authProvider.togglePasswordVisibility,
-                          icon: Icon(
-                            authProvider.isPasswordHidden
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                            size: 16,
-                          ),
-                          label: Text(
-                            authProvider.isPasswordHidden
-                                ? 'Show Password'
-                                : 'Hide Password',
-                          ),
-                          style: TextButton.styleFrom(
-                            foregroundColor: AppColors.secondary,
-                            textStyle: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
 
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 15),
 
                       PrimaryButton(
                         text: 'Sign In',

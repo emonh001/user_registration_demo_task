@@ -12,7 +12,9 @@ class AuthTextField extends StatelessWidget {
     this.obscureText = false,
     this.validator,
     this.textInputAction,
-    this.trailing,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.suffixIconOnTap
   });
 
   final String label;
@@ -22,7 +24,10 @@ class AuthTextField extends StatelessWidget {
   final bool obscureText;
   final String? Function(String?)? validator;
   final TextInputAction? textInputAction;
-  final Widget? trailing;
+  final Icon? prefixIcon;
+  final Icon? suffixIcon;
+  final VoidCallback? suffixIconOnTap;
+
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +45,6 @@ class AuthTextField extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            if (trailing != null) trailing!,
           ],
         ),
         const SizedBox(height: 6),
@@ -71,6 +75,8 @@ class AuthTextField extends StatelessWidget {
             focusedBorder: _border(color: AppColors.primary, width: 1.4),
             errorBorder: _border(color: Colors.red),
             focusedErrorBorder: _border(color: Colors.red, width: 1.4),
+            prefixIcon: prefixIcon,
+            suffixIcon: IconButton(onPressed: suffixIconOnTap, icon: suffixIcon ?? Icon(null))
           ),
         ),
       ],

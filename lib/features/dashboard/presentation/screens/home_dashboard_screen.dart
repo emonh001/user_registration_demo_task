@@ -22,20 +22,6 @@ class HomeDashboardScreen extends StatelessWidget {
 
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                "Dashboard",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.tertiary,
-                ),
-              ),
-            ),
-
-            SizedBox(height: 12),
-
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
               child: ProfileCard(),
             ),
           ],

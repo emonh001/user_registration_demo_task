@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../bottom_nav_holder/presentation/providers/bottom_nav_provider.dart';
 
 class ProfileCard extends StatelessWidget {
   const ProfileCard({super.key});
@@ -48,20 +50,26 @@ class ProfileCard extends StatelessWidget {
           SizedBox(
             width: 120,
             height: 36,
-            child: ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: const Text(
-                "Edit Profile",
-                style: TextStyle(fontSize: 12),
-              ),
+            child: Consumer<BottomNavProvider>(
+              builder: (context, nav, child) {
+                return ElevatedButton(
+                  onPressed: () {
+                    nav.changeIndex(1);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    "Edit Profile",
+                    style: TextStyle(fontSize: 12),
+                  ),
+                );
+              }
             ),
           ),
         ],

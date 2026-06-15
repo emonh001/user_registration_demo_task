@@ -26,6 +26,15 @@ class DBProvider {
       path,
       version: DBConstants.dbVersion,
       onCreate: DBInit.createTables,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE users ADD COLUMN image_path TEXT');
+        }
+
+        if (oldVersion < 3) {
+          await db.execute('ALTER TABLE users ADD COLUMN created_at TEXT');
+        }
+      },
     );
   }
 }

@@ -32,6 +32,7 @@ class AuthProvider extends ChangeNotifier {
 
   AuthStatus get status => _status;
 
+
   // -------------------------
   // VALIDATION (FIXED)
   // -------------------------
@@ -98,27 +99,52 @@ class AuthProvider extends ChangeNotifier {
   // AUTO LOGIN SUPPORT
   // -------------------------
   Future<void> loadSessionUser() async {
-    final userId = await _repository.getCurrentUserId();
+    try {
+      _status = AuthStatus.unknown;
+      notifyListeners();
 
-    if (userId == null) {
+      final userId = await _repository.getCurrentUserId();
+
+      if (userId == null) {
+        _status = AuthStatus.unauthenticated;
+        notifyListeners();
+        return;
+      }
+
+      final user = await _repository.getUserById(userId);
+
+      if (user == null) {
+        _status = AuthStatus.unauthenticated;
+        notifyListeners();
+        return;
+      }
+
+      _currentUser = user;
+
+      _status = AuthStatus.authenticated;
+      notifyListeners();
+    } catch (e) {
+      debugPrint("SESSION LOAD ERROR: $e");
+
       _status = AuthStatus.unauthenticated;
       notifyListeners();
-      return;
     }
+  }
 
+  Future<void> refreshUser(int userId) async {
     final user = await _repository.getUserById(userId);
 
-    if (user == null) {
-      _status = AuthStatus.unauthenticated;
-      notifyListeners();
-      return;
-    }
+    if (user == null) return;
 
     _currentUser = user;
-    _status = AuthStatus.authenticated;
-
     notifyListeners();
   }
+
+  void setUser(UserModel user) {
+    _currentUser = user;
+    notifyListeners();
+  }
+
 
   void logout() async {
     await _repository.logout();

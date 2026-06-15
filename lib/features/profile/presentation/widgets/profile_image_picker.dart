@@ -1,33 +1,51 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
+import 'package:provider/provider.dart';
+
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../providers/edit_profile_provider.dart';
 
 class ProfileImagePicker extends StatelessWidget {
   const ProfileImagePicker({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<EditProfileProvider>();
+
+    final imagePath = provider.imagePath;
+
+
     return Column(
       children: [
         Stack(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
               radius: 55,
-              backgroundImage: AssetImage("assets/profile.jpg"),
+              backgroundImage: (imagePath != null && imagePath.isNotEmpty)
+                  ? FileImage(File(imagePath))
+                  : const AssetImage("assets/images/profile.jpg")
+              as ImageProvider,
             ),
 
             Positioned(
               bottom: 0,
               right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.edit,
-                  size: 16,
-                  color: Colors.white,
+              child: GestureDetector(
+                onTap: () {
+                  // ONLY EDIT ACTION (NO UI CHANGE HERE)
+                  provider.pickFromGallery();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
+                    color: Colors.blue,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.edit,
+                    size: 16,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -37,11 +55,8 @@ class ProfileImagePicker extends StatelessWidget {
         const SizedBox(height: 10),
 
         const Text(
-          "Change Profile Photo",
-          style: TextStyle(
-            color: AppColors.secondary,
-            fontSize: 13,
-          ),
+          "Profile Photo",
+          style: TextStyle(fontSize: 13),
         ),
       ],
     );

@@ -17,19 +17,23 @@ class EditProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) {
-        final provider = EditProfileProvider(
-          repository: context.read<AuthRepository>(),
-        );
-
         final auth = context.read<AuthProvider>();
         final user = auth.currentUser;
 
+        final provider = EditProfileProvider(
+          repository: context.read<AuthRepository>(),
+          onUserUpdated: (user) {
+            context.read<AuthProvider>().setUser(user);
+          },
+        );
+
         if (user != null) {
           provider.initData(
-            name: user.fullName,
-            email: user.email,
-            phone: user.phone ?? "+8801",
-            password: user.password
+            name: user.fullName ?? "",
+            email: user.email ?? "",
+            phone: user.phone ?? "",
+            password: user.password ?? "",
+            imagePath: user.imagePath, // 🔥 FIXED (MISSING BEFORE)
           );
         }
 
@@ -108,15 +112,18 @@ class _EditProfileView extends StatelessWidget {
 
                 SaveButton(
                   isLoading: provider.isLoading,
-                  onPressed: () {
-                    final auth = context.read<AuthProvider>();
+                    onPressed: () async {
+                      final auth = context.read<AuthProvider>();
+                      final edit = context.read<EditProfileProvider>();
 
-                    final userId = auth.currentUser?.id;
+                      final userId = auth.currentUser!.id!;
 
-                    if (userId == null) return;
+                      final success = await edit.saveProfile(userId);
 
-                    provider.saveProfile(userId);
-                  },
+                      if (success) {
+                        await auth.refreshUser(userId);
+                      }
+                    }
                 ),
               ],
             ),

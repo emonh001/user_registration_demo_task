@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:user_signup/features/auth/data/repositories/auth_repository.dart';
 
 import '../../../auth/data/models/user_model.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
+import '../../data/profile_image_service.dart';
 
 class EditProfileProvider extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
@@ -10,26 +13,61 @@ class EditProfileProvider extends ChangeNotifier {
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
+  final Function(UserModel user) onUserUpdated;
 
   final AuthRepository _repository;
-  EditProfileProvider({required AuthRepository repository})
-      : _repository = repository;
+
+
+  EditProfileProvider({
+    required AuthRepository repository,
+    required this.onUserUpdated,
+  }) : _repository = repository;
 
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
 
+  final ProfileImageService _imageService = ProfileImageService();
+
+  String? _imagePath;
+  String? get imagePath => _imagePath;
+
   void initData({
     required String name,
     required String email,
     required String phone,
-    required String password
+    required String password,
+    String? imagePath
   }) {
     nameController.text = name;
     emailController.text = email;
     phoneController.text = phone;
     passwordController.text = password;
+    _imagePath = imagePath;
     passwordController.clear();
+  }
+
+  Future<void> pickFromGallery() async {
+    final file = await _imageService.pickFromGallery();
+    if (file == null) return;
+
+    final path = await _imageService.saveToLocalDirectory(file);
+
+    setImagePath(path);
+  }
+
+  Future<void> captureFromCamera() async {
+    final file = await _imageService.captureFromCamera();
+    if (file == null) return;
+
+    final path = await _imageService.saveToLocalDirectory(file);
+
+    setImagePath(path);
+  }
+
+  void setImagePath(String path) {
+    _imagePath = path;
+    notifyListeners();
   }
 
   void setLoading(bool value) {
@@ -44,35 +82,35 @@ class EditProfileProvider extends ChangeNotifier {
     setLoading(true);
 
     try {
-      // 1. GET EXISTING USER
       final existingUser = await _repository.getUserById(userId);
-
       if (existingUser == null) return false;
 
-      // 2. CHECK PASSWORD INPUT
       final newPassword = passwordController.text.trim();
 
       final finalPassword = newPassword.isNotEmpty
           ? newPassword
           : existingUser.password;
 
-      // 3. BUILD UPDATED USER
+      final finalImagePath = _imagePath ?? existingUser.imagePath;
+
       final updatedUser = UserModel(
         id: userId,
         fullName: nameController.text.trim(),
         email: emailController.text.trim(),
         phone: phoneController.text.trim(),
-
-        // 🔥 SMART PASSWORD HANDLING
         password: finalPassword,
-
+        imagePath: finalImagePath,
         createdAt: existingUser.createdAt,
       );
 
-      // 4. UPDATE DB
-      final result = await _repository.updateProfile(updatedUser);
+      await _repository.updateProfile(updatedUser);
+      final refreshedUser = await _repository.getUserById(userId);
+      if (refreshedUser != null) {
+        onUserUpdated(refreshedUser);
+      }
 
-      return result;
+
+      return true;
     } finally {
       setLoading(false);
     }

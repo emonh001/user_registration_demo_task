@@ -10,11 +10,20 @@ class AuthLocalDataSource {
   Future<int> registerUser(UserModel user) async {
     final db = await _dbProvider.database;
 
-    return await db.insert(
-      DBConstants.userTable,
-      user.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    try {
+      final result = await db.insert(
+        DBConstants.userTable,
+        user.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      print("USER INSERTED ID: $result");
+
+      return result;
+    } catch (e) {
+      print("DB INSERT ERROR: $e");
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>?> loginUser(
@@ -52,7 +61,7 @@ class AuthLocalDataSource {
 
   Future<int> updateUser(UserModel user) async {
     final db = await _dbProvider.database;
-
+    print("SAVE IMAGE PATH → ${user.imagePath}");
     return await db.update(
       DBConstants.userTable,
       user.toMap(),
@@ -60,4 +69,6 @@ class AuthLocalDataSource {
       whereArgs: [user.id],
     );
   }
+
+
 }

@@ -40,8 +40,10 @@ class _UserSignupAppState extends State<UserSignupApp> {
     switch (auth.status) {
       case AuthStatus.unknown:
         return const SplashScreen();
+
       case AuthStatus.authenticated:
         return const DashboardShell();
+
       case AuthStatus.unauthenticated:
         return const SignInScreen();
     }

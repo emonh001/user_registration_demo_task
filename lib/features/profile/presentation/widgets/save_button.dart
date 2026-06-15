@@ -35,7 +35,7 @@ class SaveButton extends StatelessWidget {
         )
             : const Text(
           "Save Changes",
-          style: TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.white),
         ),
       ),
     );

@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:user_signup/app/user_signup_app.dart';
+import 'app/bootstrap.dart';
 
-void main(){
-  runApp(UserSignupApp());
+void main() {
+  bootstrap();
 }

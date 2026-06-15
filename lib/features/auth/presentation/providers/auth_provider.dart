@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-
+import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 
 class AuthProvider extends ChangeNotifier {
-  AuthProvider({
-    required AuthRepository authRepository,
-  }) : _authRepository = authRepository;
+  AuthProvider({required AuthRepository repository})
+      : _repository = repository;
 
-  final AuthRepository _authRepository;
+  final AuthRepository _repository;
 
+  // -------------------------
+  // FORM STATE
+  // -------------------------
   final formKey = GlobalKey<FormState>();
 
   final emailController = TextEditingController();
@@ -17,71 +19,108 @@ class AuthProvider extends ChangeNotifier {
   bool _isLoading = false;
   bool _isPasswordHidden = true;
 
+  UserModel? _currentUser;
+
   bool get isLoading => _isLoading;
   bool get isPasswordHidden => _isPasswordHidden;
+  UserModel? get currentUser => _currentUser;
 
+  bool _initialized = false;
+  bool get initialized => _initialized;
+
+  // -------------------------
+  // VALIDATION (FIXED)
+  // -------------------------
+  String? validateEmail(String? value) {
+    final email = value?.trim() ?? '';
+
+    if (email.isEmpty) return "Email required";
+    if (!email.contains("@")) return "Invalid email";
+
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    final pass = value?.trim() ?? '';
+
+    if (pass.isEmpty) return "Password required";
+    if (pass.length < 6) return "Min 6 characters";
+
+    return null;
+  }
+
+  // -------------------------
+  // UI STATE
+  // -------------------------
   void togglePasswordVisibility() {
     _isPasswordHidden = !_isPasswordHidden;
     notifyListeners();
   }
 
+  // -------------------------
+  // SIGN IN LOGIC
+  // -------------------------
   Future<bool> signIn() async {
     final isValid = formKey.currentState?.validate() ?? false;
-
     if (!isValid) return false;
-
+    debugPrint("LOGIN STARTED");
     _setLoading(true);
 
     try {
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
 
-      final result = await _authRepository.signIn(
-        email: email,
-        password: password,
-      );
+      debugPrint("LOGIN STARTED");
+      debugPrint("EMAIL: $email");
+      debugPrint("PASSWORD: $password");
 
-      return result;
+      final user = await _repository.signIn(email, password);
+
+      debugPrint("LOGIN RESULT: $user");
+
+      _currentUser = user;
+
+      return user != null;
+    } catch (e) {
+      debugPrint("LOGIN ERROR: $e");
+      return false;
     } finally {
       _setLoading(false);
+      debugPrint("LOADING STOPPED");
     }
   }
 
-  String? validateEmail(String? value) {
-    final email = value?.trim() ?? '';
+  // -------------------------
+  // AUTO LOGIN SUPPORT
+  // -------------------------
+  Future<void> loadSessionUser() async {
+    if (_initialized) return; // 🔥 prevent infinite loop
 
-    if (email.isEmpty) {
-      return 'Email is required';
+    _initialized = true;
+
+    final userId = await _repository.getCurrentUserId();
+
+    if (userId == null) {
+      _currentUser = null;
+      notifyListeners();
+      return;
     }
 
-    if (!email.contains('@')) {
-      return 'Enter a valid email address';
-    }
+    final user = await _repository.getUserById(userId);
 
-    return null;
+    _currentUser = user;
+
+    notifyListeners();
   }
 
-  String? validatePassword(String? value) {
-    final password = value?.trim() ?? '';
-
-    if (password.isEmpty) {
-      return 'Password is required';
-    }
-
-    if (password.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
-
-    return null;
+  void logout() async {
+    await _repository.logout();
+    _currentUser = null;
+    notifyListeners();
   }
 
-  void clearFields() {
-    emailController.clear();
-    passwordController.clear();
-  }
-
-  void _setLoading(bool value) {
-    _isLoading = value;
+  void _setLoading(bool v) {
+    _isLoading = v;
     notifyListeners();
   }
 

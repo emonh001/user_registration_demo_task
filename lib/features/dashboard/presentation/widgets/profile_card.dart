@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../bottom_nav_holder/presentation/providers/bottom_nav_provider.dart';
 
 class ProfileCard extends StatelessWidget {
@@ -9,6 +10,7 @@ class ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user = context.watch<AuthProvider>().currentUser;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -26,8 +28,8 @@ class ProfileCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Alex Smith",
+          Text(
+            user?.fullName ?? "",
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -37,8 +39,8 @@ class ProfileCard extends StatelessWidget {
 
           const SizedBox(height: 4),
 
-          const Text(
-            "alex.smith@example.com",
+          Text(
+            user?.email ?? "",
             style: TextStyle(
               fontSize: 13,
               color: AppColors.mutedText,

@@ -21,7 +21,6 @@ class SignUpScreen extends StatelessWidget {
         const SnackBar(content: Text('Account created successfully')),
       );
 
-      // TODO: Navigate to dashboard screen or sign-in screen.
       Navigator.of(context).maybePop();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

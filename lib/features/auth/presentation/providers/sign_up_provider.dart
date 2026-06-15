@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
 
 class SignUpProvider extends ChangeNotifier {
@@ -40,15 +41,17 @@ class SignUpProvider extends ChangeNotifier {
 
     _setLoading(true);
 
-    try {
-      return await _authRepository.signUp(
-        fullName: fullNameController.text.trim(),
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-    } finally {
-      _setLoading(false);
-    }
+    final user = UserModel(
+      fullName: fullNameController.text.trim(),
+      email: emailController.text.trim(),
+      password: passwordController.text.trim(),
+      createdAt: DateTime.now().toIso8601String(),
+    );
+
+    final result = await _authRepository.signUp(user); // ✅ FIXED
+
+    _setLoading(false);
+    return result;
   }
 
   String? validateFullName(String? value) {

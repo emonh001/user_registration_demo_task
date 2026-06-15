@@ -26,7 +26,7 @@ class AppProviders extends StatelessWidget {
         ),
         ChangeNotifierProvider<AuthProvider>(
           create: (context) => AuthProvider(
-            authRepository: context.read<AuthRepository>(),
+            repository: context.read<AuthRepository>(),
           ),
         ),
         ChangeNotifierProvider<SignUpProvider>(

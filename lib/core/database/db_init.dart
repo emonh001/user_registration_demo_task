@@ -10,7 +10,8 @@ class DBInit {
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         phone TEXT,
-        created_at TEXT NOT NULL
+        created_at TEXT NOT NULL,
+        image_path TEXT
       )
     ''');
   }
